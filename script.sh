@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ueE
+set -eE
 
 # Checks if needed dependencies are installed on the system.
 MISSING_DEPENDENCIES=false
@@ -18,7 +18,7 @@ fi
 if ! command -v ffmpeg &> /dev/null
 then
     echo "ffmpeg missing! Find it at https://github.com/FFmpeg/FFmpeg"
-    $MISSING_DEPENDENCIES=true
+    MISSING_DEPENDENCIES=true
 fi
 if ! command -v findimagedupes &> /dev/null
 then
@@ -28,7 +28,6 @@ fi
 
 if [ $MISSING_DEPENDENCIES = true ]
 then
-    echo "Missing dependencies. Abort!" > /dev/stderr
     exit 1
 fi
 
@@ -43,19 +42,20 @@ FRAMESDIR=$ROOTDIR/frames   # The dir containing the video's frames
 trap "rm -rf $ROOTDIR" ERR 
 
 # First, download the video
-youtube-dl --output $VIDEOFILE $1
+youtube-dl --output "$VIDEOFILE" "$1"
 
 # Extract a good amount of video frames
-mkdir $FRAMESDIR
-ffmpeg -i $VIDEOFILE -vf fps=0.30 $FRAMESDIR/thumb%04d.jpg -hide_banner
-rm $VIDEOFILE
+mkdir "$FRAMESDIR"
+ffmpeg -i "$VIDEOFILE" -vf fps=0.30 "$FRAMESDIR"/thumb%04d.jpg -hide_banner
+rm "$VIDEOFILE"
 
 # Find which frames are duplicates and discard them; then, put the names of the
 # remaining frames in a file
-findimagedupes -t 95% $FRAMESDIR | awk '{print $1}' | sort > $ROOTDIR/.list-out
+findimagedupes -t 95% "$FRAMESDIR" | awk '{print $1}' | sort > "$ROOTDIR"/.list-out
 
 # Collect all the frames into a single .pdf
-convert @$ROOTDIR/.list-out out.pdf
+convert @"$ROOTDIR"/.list-out out.pdf
 
 # Cleanup
-rm -rf $ROOTDIR
+rm -rf "$ROOTDIR"
+
