@@ -28,6 +28,7 @@ fi
 
 if [ $MISSING_DEPENDENCIES = true ]
 then
+    echo "Missing dependencies; abort!" > /dev/stderr
     exit 1
 fi
 
@@ -35,7 +36,7 @@ fi
 
 # Let's first set up some useful variables
 ROOTDIR=$(mktemp -d)        # The (temp) directory we will work in
-VIDEOFILE=$ROOTDIR/out.webm # The path to the downloaded video
+VIDEOFILE=$ROOTDIR/out      # The path to the downloaded video
 FRAMESDIR=$ROOTDIR/frames   # The dir containing the video's frames
 
 # This traps possible errors and performs a cleanup of the temporary directory
@@ -43,6 +44,10 @@ trap "rm -rf $ROOTDIR" ERR
 
 # First, download the video
 youtube-dl --output "$VIDEOFILE" "$1"
+
+# We don't know beforehand the extension of the downloaded video
+# file, so we perform this hack:
+VIDEOFILE="$ROOTDIR/"$(ls "$ROOTDIR")
 
 # Extract a good amount of video frames
 mkdir "$FRAMESDIR"
