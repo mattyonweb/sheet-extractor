@@ -1,6 +1,6 @@
 # sheet-extractor.sh
 
-An advanced recurrent neural network (RNN) to extract sheets from Youtube music videos. 
+An advanced recurrent neural network (RNN) implemented in `bash`, mainly useful to extract scores from Youtube music videos. 
 
 ## Installation
 
